@@ -1,0 +1,166 @@
+@(ticket: play.data.Form[Ticket])
+@main("Edit Ticket"){
+
+
+    @helper.form(action = routes.TicketController.updateTicket, 'id -> "ticketForm", 'class -> "form-horizontal") {
+        <div class="container">
+		<h1>Edit Ticket</h1>
+		<input type="hidden" name="createdUser.id" value="@session.get("userProfile")" />
+		<input type="hidden" name="id" value="@ticket("id").value" />
+		
+					<div class="form-group">
+                        <label class="col-md-2 control-label">Title</label>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" name="title" placeholder="Title" data-bv-notempty="true" data-bv-notempty-message="Title is required" value="@ticket("title").value" autocomplete="off" />
+                        </div>
+                        
+                        <label class="col-md-2 control-label">Status</label>
+                        <div class="col-md-3">
+                        <select class="selectpicker" id="status" name="status" >
+						<option value="NEW">NEW</option>
+						<option value="OPEN">OPEN</option>
+						<option value="CLOSED">CLOSED</option>
+						</select>
+						</div>
+                    </div>
+                    
+                    <div class="form-group">
+                    
+                        <label class="col-md-2 control-label">Assigned To</label>
+                        <div class="col-md-3">
+                        <input type="hidden" id="assignedToId" name="assignedTo.id" value="@ticket("assignedTo.id").value" />
+                        <input type="text" class="form-control" id="assignedTo" name="assignedTo.email" placeholder="Search User To Assign Ticket" autocomplete="off" onkeyup="javascript:autoComplete(this.value, 'USER', 'assignedTo')" value="@ticket("assignedTo.email").value" />
+                        </div>
+                        
+                        <label class="col-md-2 control-label">Customer Email</label>
+                        <div class="col-md-3">
+                        <input type="hidden" id="reportedById" name="reportedBy.id" value="@ticket("reportedBy.id").value" />
+						<input type="text" class="form-control" id="reportedBy" readonly="true" name="reportedBy.email" value="@ticket("reportedBy.email").value"  />
+                        </div>
+                        
+                    </div>
+
+				<div id="customer-info" >
+				
+				<h3>Customer Details</h3>
+				
+				
+				    <div class="form-group">
+                    
+                        <label class="col-md-2 control-label">First Name</label>
+                        <div class="col-md-3">
+                        <input type="text" class="form-control" id="firstName" readonly="true" name="reportedBy.firstName" value="@ticket("reportedBy.firstName").value" />
+                        </div>
+                        
+                        <label class="col-md-2 control-label">Last Name</label>
+                        <div class="col-md-3">
+                        <input type="text" class="form-control" id="lastName" readonly="true" name="reportedBy.lastName" value="@ticket("reportedBy.lastName").value" />
+                        </div>
+                        
+                    </div>
+                    
+                    <div class="form-group">
+                    
+                        <label class="col-md-2 control-label">Address1</label>
+                        <div class="col-md-3">
+                        <input type="text" class="form-control" id="address1" name="reportedBy.address1" data-bv-notempty="true" data-bv-notempty-message="Address1 is required" placeholder="Address1" value="@ticket("reportedBy.address1").value" />
+                        </div>
+                        
+                        <label class="col-md-2 control-label">Address2</label>
+                        <div class="col-md-3">
+                        <input type="text" class="form-control" id="address2" name="reportedBy.address2" placeholder="Address2" value="@ticket("reportedBy.address2").value" />
+                        </div>
+                        
+                    </div>
+                    
+                    <div class="form-group">
+                    
+                        <label class="col-md-2 control-label">City</label>
+                        <div class="col-md-3">
+                        <input type="text" class="form-control" id="city" name="reportedBy.city" data-bv-notempty="true" data-bv-notempty-message="City is required" placeholder="City" value="@ticket("reportedBy.city").value" />
+                        </div>
+                        
+                        <label class="col-md-2 control-label">State</label>
+                        <div class="col-md-3">
+                        <input type="text" class="form-control" id="state" name="reportedBy.state" data-bv-notempty="true" data-bv-notempty-message="State is required" placeholder="State" value="@ticket("reportedBy.state").value" />
+                        </div>
+                        
+                    </div>
+
+                    <div class="form-group">
+                    
+                        <label class="col-md-2 control-label">Phone</label>
+                        <div class="col-md-3">
+                        <input type="text" class="form-control" id="phone" name="reportedBy.phone" placeholder="Phone" value="@ticket("reportedBy.phone").value" />
+                        </div>
+                        
+                        <label class="col-md-2 control-label">Zip</label>
+                        <div class="col-md-3">
+                        <input type="text" class="form-control" id="zip" name="reportedBy.zip" placeholder="Zip" value="@ticket("reportedBy.zip").value" />
+                        </div>
+                        
+                    </div>
+				</div>
+				
+				<div class="form-group">
+				 <label class="col-md-2 control-label">Comment</label>
+                        <div class="col-md-3">
+                        <input type="text" style="height:120px;" class="form-control" id="comment0" name="comments[0].comment" data-bv-notempty="true" data-bv-notempty-message="Comment is required" />
+                        </div>
+				</div>
+				@if(ticket("status").value != "CLOSED"){
+                <div class="form-group">
+                    <div class="col-md-5 col-md-offset-3">
+                        <button type="submit" class="btn btn-primary">Update Ticket</button>
+                    </div>
+                </div>
+                }
+                
+	</div>
+        
+        
+    }
+            <script>
+            
+
+
+            $(document).ready(function() {
+                $('#ticketForm').bootstrapValidator();
+                $('#status option[value="@ticket("status").value"]').prop('selected', true);
+                $('.selectpicker').selectpicker();
+            });
+            
+    		function autoComplete(searchText, lookupType, divId)
+    		{
+    				
+    			$.getJSON('/autocomplete', {
+    				searchText : searchText,
+    				lookupType : lookupType
+    			}, function(data) {
+    				$("#"+divId).autocomplete( {
+    					source : data,
+    					minLength : 1,
+    					select : function(event, ui) {
+    						setValues(event, ui, lookupType);
+
+    					}
+    				}).focus(function() {
+    					if ($(this).val().length == 1) {
+    						$(this).autocomplete("search");
+    					}
+    				});
+    			});
+    		}
+    		
+    		function setValues(event, ui, lookupType){
+    			if(lookupType == 'USER'){
+    				$("#assignedTo").val(ui.item.value);
+    				$("#assignedToId").val(ui.item.id);
+    			}
+    		}           	
+  		
+		$("#phone").mask("999-999-9999");
+		$("#zip").mask("99999?-9999");
+
+        </script>
+}

@@ -1,0 +1,182 @@
+@(form: play.data.Form[Ticket])
+@main("Create Ticket"){
+
+    @helper.form(action = routes.TicketController.addTicket, 'id -> "ticketForm", 'class -> "form-horizontal") {
+        <div class="container">
+		<h1>Create Ticket</h1>
+		<input type="hidden" name="createdUser.id" value="@session.get("userProfile")" />
+		
+		
+					<div class="form-group">
+                        <label class="col-md-2 control-label">Title</label>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" name="title" placeholder="Title" data-bv-notempty="true" data-bv-notempty-message="Title is required" autocomplete="off" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                    
+                        <label class="col-md-2 control-label">Assigned To</label>
+                        <div class="col-md-3">
+                        <input type="hidden" id="assignedToId" name="assignedTo.id" />
+                        <input type="text" class="form-control" id="assignedTo" name="assignedTo.email" placeholder="Search User To Assign Ticket" autocomplete="off" onkeyup="javascript:autoComplete(this.value, 'USER', 'assignedTo')" />
+                        </div>
+                        
+                        <label class="col-md-2 control-label">Customer Email</label>
+                        <div class="col-md-3">
+                        <input type="hidden" id="reportedById" name="reportedBy.id" >
+						<input type="text" class="form-control" id="reportedBy" name="reportedBy.email" placeholder="Search Customer Email" data-bv-notempty="true" data-bv-notempty-message="Customer Email is required" autocomplete="off" onkeyup="javascript:autoComplete(this.value, 'CUSTOMER', 'reportedBy')" />
+                        </div>
+                        
+                    </div>
+                    
+					<div class="form-group">
+						<div id="customer-check" class="checkbox">
+					    <label>
+					      <input type="checkbox" id="customer" name="customer" /> If Customer not found, Please check to enter Customer details
+					    </label>
+						</div>
+					</div>
+				<div id="customer-info" style="display:none;">
+				
+				<h3>Customer Details</h3>
+				
+				
+				    <div class="form-group">
+                    
+                        <label class="col-md-2 control-label">First Name</label>
+                        <div class="col-md-3">
+                        <input type="text" class="form-control" id="firstName" name="reportedBy.firstName" data-bv-notempty="true" data-bv-notempty-message="First Name is required" placeholder="First Name"/>
+                        </div>
+                        
+                        <label class="col-md-2 control-label">Last Name</label>
+                        <div class="col-md-3">
+                        <input type="text" class="form-control" id="lastName" name="reportedBy.lastName" data-bv-notempty="true" data-bv-notempty-message="Last Name is required" placeholder="Last Name"/>
+                        </div>
+                        
+                    </div>
+                    
+                    <div class="form-group">
+                    
+                        <label class="col-md-2 control-label">Address1</label>
+                        <div class="col-md-3">
+                        <input type="text" class="form-control" id="address1" name="reportedBy.address1" data-bv-notempty="true" data-bv-notempty-message="Address1 is required" placeholder="Address1"/>
+                        </div>
+                        
+                        <label class="col-md-2 control-label">Address2</label>
+                        <div class="col-md-3">
+                        <input type="text" class="form-control" id="address2" name="reportedBy.address2" placeholder="Address2"/>
+                        </div>
+                        
+                    </div>
+                    
+                    <div class="form-group">
+                    
+                        <label class="col-md-2 control-label">City</label>
+                        <div class="col-md-3">
+                        <input type="text" class="form-control" id="city" name="reportedBy.city" data-bv-notempty="true" data-bv-notempty-message="City is required" placeholder="City"/>
+                        </div>
+                        
+                        <label class="col-md-2 control-label">State</label>
+                        <div class="col-md-3">
+                        <input type="text" class="form-control" id="state" name="reportedBy.state" data-bv-notempty="true" data-bv-notempty-message="State is required" placeholder="State"/>
+                        </div>
+                        
+                    </div>
+
+                    <div class="form-group">
+                    
+                        <label class="col-md-2 control-label">Phone</label>
+                        <div class="col-md-3">
+                        <input type="text" class="form-control" id="phone" name="reportedBy.phone" placeholder="Phone" />
+                        </div>
+                        
+                        <label class="col-md-2 control-label">Zip</label>
+                        <div class="col-md-3">
+                        <input type="text" class="form-control" id="zip" name="reportedBy.zip" placeholder="Zip" />
+                        </div>
+                        
+                    </div>
+				</div>
+				
+				<div class="form-group">
+				 <label class="col-md-2 control-label">Comment</label>
+                        <div class="col-md-3">
+                        <input type="text" style="height:120px;" class="form-control" id="comment0" name="comments[0].comment" data-bv-notempty="true" data-bv-notempty-message="Comment is required" />
+                        </div>
+				</div>
+
+                <div class="form-group">
+                    <div class="col-md-5 col-md-offset-3">
+                        <button type="submit" class="btn btn-primary">Add Ticket</button>
+                    </div>
+                </div>
+	</div>
+        
+        
+    }
+            <script>
+            
+
+
+            $(document).ready(function() {
+                $('#ticketForm').bootstrapValidator();
+            });
+
+            function validate(field){
+            	$('#ticketForm').data('bootstrapValidator').revalidateField(field)
+            }
+            
+    		function autoComplete(searchText, lookupType, divId)
+    		{
+    				
+    			$.getJSON('/autocomplete', {
+    				searchText : searchText,
+    				lookupType : lookupType
+    			}, function(data) {
+    				$("#"+divId).autocomplete( {
+    					source : data,
+    					minLength : 1,
+    					select : function(event, ui) {
+    						setValues(event, ui, lookupType);
+
+    					}
+    				}).focus(function() {
+    					if ($(this).val().length == 1) {
+    						$(this).autocomplete("search");
+    					}
+    				});
+    			});
+    		}
+    		
+    		function setValues(event, ui, lookupType){
+    			if(lookupType == 'USER'){
+    				$("#assignedTo").val(ui.item.value);
+    				$("#assignedToId").val(ui.item.id);
+    			}else if(lookupType == 'CUSTOMER'){
+    				$('#customer-info').css('display','block');
+    				$("#reportedBy").val(ui.item.value);
+    				$("#reportedById").val(ui.item.id);
+    				$("#firstName").val(ui.item.firstname);
+    				$("#lastName").val(ui.item.lastname);
+    				$("#phone").val(ui.item.phone);
+    				$("#address1").val(ui.item.address1);
+    				$("#address2").val(ui.item.address2);
+    				$("#city").val(ui.item.city);
+    				$("#state").val(ui.item.state);
+    				$("#zip").val(ui.item.zip);
+    				$('#customer-check').css('display','none');
+    			}
+    		}           	
+            	
+		$('input[type="checkbox"]').change(function() {
+		     if(this.checked) {
+		    	 $('#customer-info').css('display','block');
+		     }else{
+		    	 $('#customer-info').css('display','none');
+		     }
+		 });
+		
+		$("#phone").mask("999-999-9999");
+		$("#zip").mask("99999?-9999");
+        </script>
+}

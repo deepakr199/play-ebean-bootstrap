@@ -1,0 +1,70 @@
+@(tickets: com.avaje.ebean.Page[Ticket])
+@main("Ticket dashboard") {
+<div class="container">
+  <h2>All Tickets</h2>
+
+   <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Ticket No.</th>
+        <th>Reported By</th>
+        <th>Created By</th>
+        <th>Assigned To</th>
+        <th>Status</th>
+		<th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+    @for(ticket <- tickets.getList()) {
+
+      <tr>
+        <td>TA-@ticket.id</td>
+        <td>@ticket.reportedBy.firstName</td>
+        <td>@ticket.createdUser.firstName</td>
+        <td>@ticket.assignedTo.firstName</td>
+        <td>@ticket.status</td>
+         @if(ticket.status == "CLOSED") {
+        <td><a href="@routes.TicketController.viewTicket(ticket.id)">View Ticket</a></td>
+                } else {
+        <td><a href="@routes.TicketController.viewTicket(ticket.id)">Edit Ticket</a></td>
+                }
+      </tr>
+      }
+  
+    </tbody>
+   </table>
+
+        <ul class="pagination">
+        
+        
+         @if(tickets.hasPrev) {
+                    <li class="prev">
+                        <a href="@routes.TicketController.dashboard(tickets.getPageIndex - 1)">&laquo;</a>
+                    </li>
+                } else {
+                    <li class="prev disabled">
+                        <a>&laquo;</a>
+                    </li>
+                }
+                <li class="current active">
+                    <a>@tickets.getDisplayXtoYofZ(" - "," / ")</a>
+                </li>
+                @if(tickets.hasNext) {
+                    <li class="next">
+                        <a href="@routes.TicketController.dashboard(tickets.getPageIndex + 1)">&raquo;</a>
+                    </li>
+                } else {
+                    <li class="next disabled">
+                        <a>&raquo;</a>
+                    </li>
+                }
+		</ul>
+
+  
+  <div class="form-group">
+                        <div class="text-right">
+  <a href="@routes.TicketController.ticketForm()" class="btn btn-primary">Create Ticket</a>
+  </div>
+  </div>
+</div>
+}
